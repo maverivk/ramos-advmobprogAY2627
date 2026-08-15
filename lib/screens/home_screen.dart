@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
           automaticallyImplyLeading: false,
           elevation: 2,
           title: (_selectedIndex == 0)
-              ? Image.asset('assets/images/nubedexchange_logo.png', scale: 11.sp)
+              ? Image.asset('assets/images/NU_bulldogLogo.png', scale: 11.sp)
               : CustomText(
                   text: (_selectedIndex == 1)
                       ? 'Chat'

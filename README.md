@@ -1,16 +1,16 @@
-# ramos_advmobprog
+# ramos_advmobprogAY2627
 
-A new Flutter project.
+Submitted by: Ramos, Maverick Adam B. 
+INF 235
 
-## Getting Started
+Laboratory Discussion :
 
-This project is a starting point for a Flutter application.
+Discuss how the model, services and screen interact with each other to render the 
+API endpoint. Discuss about the new design pattern in this activity 
 
-A few resources to get you started if this is your first Flutter project:
+Answer :
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+The model fixes the data like setting it up to the proper format, the service gets the data from the internet or API, and the screen is the UI to which to user interacts with.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
