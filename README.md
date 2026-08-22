@@ -5,12 +5,18 @@ INF 235
 
 Laboratory Discussion :
 
-Discuss how the model, services and screen interact with each other to render the 
-API endpoint. Discuss about the new design pattern in this activity 
+Discuss how the cart model, services and screen interact with each other to render
+the API endpoint going to the same detail_screen.dart. Discuss the updated design pattern in this activity. Also
+discuss how to use getbyId at Cart endpoint.
+
 
 Answer :
 
-The model fixes the data like setting it up to the proper format, the service gets the data from the internet or API, and the screen is the UI to which to user interacts with.
+The cart model consists of all the products that are placed in the cart. The cart service is the getter of the data from the API. and the cart screen is where the user interacts with, adding or removing items in the cart. the design of this activity revolves around the user being the one with the ID that has access to its own cart.
+
+
+
+
 
 
 

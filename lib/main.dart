@@ -11,6 +11,7 @@ import 'screens/settings_screen.dart';
 
 // providers
 import 'providers/theme_provider.dart';
+import 'providers/cart_provider.dart'; // Add this
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +26,11 @@ class RamosAdvMobProg extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<ThemeProvider>(
-      create: (_) => ThemeProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()), // Add this
+      ],
       child: ScreenUtilInit(
         designSize: const Size(412, 715),
         minTextAdapt: true,

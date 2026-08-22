@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'product_screen.dart';
+import 'cart_screen.dart';
 import '../widgets/custom_text.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,10 +26,28 @@ class _HomeScreenState extends State<HomeScreen> {
           automaticallyImplyLeading: false,
           elevation: 2,
           title: (_selectedIndex == 0)
-              ? Image.asset('assets/images/NU_bulldogLogo.png', scale: 11.sp)
+              ? Image.asset(
+                  'assets/images/NU_bulldogLogo.png',
+                  height: 40.h,
+                  width: 120.w,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Row(
+                      children: [
+                        Icon(Icons.shop, size: 30.sp),
+                        SizedBox(width: 8.w),
+                        CustomText(
+                          text: 'E-Shop',
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ],
+                    );
+                  },
+                )
               : CustomText(
                   text: (_selectedIndex == 1)
-                      ? 'Chat'
+                      ? 'Cart'
                       : (_selectedIndex == 2)
                           ? 'Profile'
                           : 'Home',
@@ -45,7 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
         body: PageView(
           physics: const NeverScrollableScrollPhysics(),
           controller: _pageController,
-          children: const <Widget>[ProductScreen()],
+          children: const <Widget>[
+            ProductScreen(),
+            CartScreen(),
+            // ProfileScreen(), // You can add this later
+          ],
           onPageChanged: (page) {
             setState(() {
               _selectedIndex = page;
@@ -59,10 +82,34 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _selectedIndex,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.shop_2), label: 'Shop'),
-            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+            BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),
+        // FloatingActionButton for Chat (hidden on Cart screen)
+        floatingActionButton: Visibility(
+          visible: _selectedIndex != 1, // Hide on Cart screen
+          child: FloatingActionButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: CustomText(
+                    text: 'Chat feature coming soon!',
+                    fontSize: 14.sp,
+                  ),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
+            backgroundColor: Theme.of(context).primaryColor,
+            child: Icon(
+              Icons.chat,
+              color: Colors.white,
+              size: 28.sp,
+            ),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }

@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
-// models
 import '../models/product.dart';
-
-// services
 import '../services/product_service.dart';
-
-// widgets
+import '../providers/cart_provider.dart'; // Add this
 import '../widgets/custom_text.dart';
-
-// screens
-import 'product_detail_screen.dart';  // Add this import
+import 'product_detail_screen.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -191,7 +186,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     crossAxisCount: 2,
                     crossAxisSpacing: 10.w,
                     mainAxisSpacing: 10.h,
-                    childAspectRatio: 0.75,
+                    childAspectRatio: 0.7,
                   ),
                   itemCount: _filteredProducts.length,
                   itemBuilder: (context, index) {
@@ -201,7 +196,7 @@ class _ProductScreenState extends State<ProductScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ProductDetailScreen(product: product),
+                            builder: (context) => ProductDetailScreen(productId: product.id),
                           ),
                         );
                       },
@@ -215,6 +210,7 @@ class _ProductScreenState extends State<ProductScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
+                              flex: 2,
                               child: Stack(
                                 children: [
                                   Image.network(
@@ -286,12 +282,12 @@ class _ProductScreenState extends State<ProductScreen> {
                                 children: [
                                   CustomText(
                                     text: product.title,
-                                    fontSize: 14.sp,
+                                    fontSize: 13.sp,
                                     fontWeight: FontWeight.bold,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  SizedBox(height: 4.h),
+                                  SizedBox(height: 2.h),
                                   Row(
                                     children: [
                                       CustomText(
@@ -300,16 +296,57 @@ class _ProductScreenState extends State<ProductScreen> {
                                         fontWeight: FontWeight.w600,
                                       ),
                                       if (product.discountPercentage > 0) ...[
-                                        SizedBox(width: 8.w),
+                                        SizedBox(width: 4.w),
                                         CustomText(
                                           text: '\$${(product.price / (1 - product.discountPercentage / 100)).toStringAsFixed(2)}',
-                                          fontSize: 11.sp,
+                                          fontSize: 10.sp,
                                           fontWeight: FontWeight.w400,
                                           color: Theme.of(context).hintColor,
                                           decoration: TextDecoration.lineThrough,
                                         ),
                                       ],
                                     ],
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  // Add to Cart Button - Now Functional
+                                  Consumer<CartProvider>(
+                                    builder: (context, cart, child) {
+                                      final isInCart = cart.items.any((item) => item.id == product.id);
+                                      return SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            cart.addToCart(product);
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: CustomText(
+                                                  text: 'Added to cart! 🛒',
+                                                  fontSize: 12.sp,
+                                                ),
+                                                backgroundColor: Colors.green,
+                                                duration: const Duration(seconds: 1),
+                                              ),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: EdgeInsets.symmetric(vertical: 4.h),
+                                            backgroundColor: isInCart 
+                                                ? Colors.green 
+                                                : Theme.of(context).primaryColor,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(6.r),
+                                            ),
+                                            minimumSize: Size(double.infinity, 28.h),
+                                          ),
+                                          child: CustomText(
+                                            text: isInCart ? '✓ In Cart' : 'Add to Cart',
+                                            fontSize: 11.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ],
                               ),
