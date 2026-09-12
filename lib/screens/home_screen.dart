@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'profile_screen.dart';
 import 'product_screen.dart';
 import 'cart_screen.dart';
+import 'chat_screen.dart';   // 👈 Added
 import '../widgets/custom_text.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -67,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: const <Widget>[
             ProductScreen(),
             CartScreen(),
-            // ProfileScreen(), // You can add this later
+            ProfileScreen(),
           ],
           onPageChanged: (page) {
             setState(() {
@@ -86,18 +87,19 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),
-        // FloatingActionButton for Chat (hidden on Cart screen)
+        // FloatingActionButton for Chat
         floatingActionButton: Visibility(
-          visible: _selectedIndex != 1, // Hide on Cart screen
+          visible: _selectedIndex != 1,
           child: FloatingActionButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: CustomText(
-                    text: 'Chat feature coming soon!',
-                    fontSize: 14.sp,
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(
+                    username: widget.username.isNotEmpty
+                        ? widget.username
+                        : 'Shopper',
                   ),
-                  duration: const Duration(seconds: 2),
                 ),
               );
             },

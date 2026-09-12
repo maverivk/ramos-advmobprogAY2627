@@ -6,12 +6,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 // screens
+import 'screens/splash_screen.dart';   // 👈 Add this
+import 'screens/signin_screen.dart';   // 👈 Add this
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 
 // providers
 import 'providers/theme_provider.dart';
-import 'providers/cart_provider.dart'; // Add this
+import 'providers/cart_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +31,7 @@ class RamosAdvMobProg extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()), // Add this
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(412, 715),
@@ -43,8 +45,10 @@ class RamosAdvMobProg extends StatelessWidget {
             darkTheme: themeModel.darkTheme,
             themeMode: themeModel.isDark ? ThemeMode.dark : ThemeMode.light,
             title: 'E-Commerce App',
-            initialRoute: '/home',
+            initialRoute: '/splash',   // 👈 Change from /home to /splash
             routes: {
+              '/splash': (context) => const SplashScreen(),   // 👈 Add
+              '/signin': (context) => const SignInScreen(),   // 👈 Add
               '/home': (context) => const HomeScreen(),
               '/settings': (context) => const SettingsScreen(),
             },
