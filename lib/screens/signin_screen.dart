@@ -50,7 +50,8 @@ class _SignInScreenState extends State<SignInScreen> {
           _isLoading = false;
         });
 
-        Navigator.pushReplacementNamed(context, '/home', arguments: response);
+        // Go to splash screen first (it auto-redirects to home)
+        Navigator.pushReplacementNamed(context, '/splash');
       } catch (e) {
         if (!mounted) return;
         setState(() {
@@ -80,6 +81,7 @@ class _SignInScreenState extends State<SignInScreen> {
               children: [
                 SizedBox(height: 40.h),
 
+                // NU Icon
                 Center(
                   child: Image.asset(
                     'assets/images/nuicon.jpeg',
