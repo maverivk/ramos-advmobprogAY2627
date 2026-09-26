@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "94912856667",
+    "project_id": "ramos-advmblprog",
+    "storage_bucket": "ramos-advmblprog.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94912856667:android:9b83377fa65bc4d84cb57e",
+        "android_client_info": {
+          "package_name": "com.example.flutter_connection"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHorHREpQ302FmxgeLrqMMkfk4B3zzMg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
