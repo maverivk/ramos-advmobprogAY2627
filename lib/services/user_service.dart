@@ -118,7 +118,7 @@ class UserService {
     }
   }
 
-  // --- GET USER DATA (Firestore + DummyJSON) ---
+  // --- GET USER DATA ---
   Future<Map<String, dynamic>?> getUserData() async {
     // DummyJSON
     if (_loginType == LoginType.dummyJson && _dummyUserData != null) {
@@ -134,14 +134,17 @@ class UserService {
             .get();
 
         if (doc.exists && doc.data() != null) {
-          return doc.data();
+          final data = doc.data()!;
+          data['uid'] = data['uid'] ?? currentUser!.uid; // ensure uid
+          return data;
         }
       } catch (e) {
         debugPrint('Error fetching user from Firestore: $e');
       }
 
-      // Fallback if Firestore doc is missing
+      // Fallback
       return {
+        'uid': currentUser!.uid,
         'firstName': currentUser!.displayName?.split(' ').first ?? 'User',
         'lastName': currentUser!.displayName?.split(' ').last ?? '',
         'email': currentUser!.email ?? 'N/A',

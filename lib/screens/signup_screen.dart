@@ -36,6 +36,7 @@ class _SignupScreenState extends State<SignupScreen> {
             .collection('users')
             .doc(cred.user!.uid)
             .set({
+          'uid': cred.user!.uid, // 👈 REQUIRED for chat
           'firstName': fNameController.text.trim(),
           'lastName': lNameController.text.trim(),
           'age': ageController.text.trim(),
