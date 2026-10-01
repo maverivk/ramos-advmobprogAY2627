@@ -59,6 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- Avatar ---
             Center(
               child: CircleAvatar(
                 radius: 50,
@@ -71,6 +72,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 16),
+
+            // --- Login Type Label ---
             Center(
               child: Text(
                 loginType == LoginType.firebase
@@ -85,7 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            // User Data Card
+            // --- User Data Card ---
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -93,8 +96,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (userData != null) ...[
-                      _infoRow('Name',
-                          '${userData!['firstName'] ?? ''} ${userData!['lastName'] ?? ''}'),
+                      _infoRow(
+                        'Name',
+                        '${userData!['firstName'] ?? ''} ${userData!['lastName'] ?? ''}',
+                      ),
                       _infoRow('Username', '${userData!['username'] ?? 'N/A'}'),
                       _infoRow('Email', '${userData!['email'] ?? 'N/A'}'),
                       _infoRow('Age', '${userData!['age'] ?? 'N/A'}'),
@@ -111,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 24),
 
-            // Settings
+            // --- Settings ---
             const Text(
               'Settings',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -167,6 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // --- Update Username Dialog ---
   void _showUpdateUsernameDialog() {
     final controller =
         TextEditingController(text: userData?['username'] ?? '');
@@ -212,6 +218,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // --- Change Password Dialog ---
   void _showChangePasswordDialog() {
     final currentPass = TextEditingController();
     final newPass = TextEditingController();
@@ -273,6 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // --- Delete Account Dialog ---
   void _showDeleteAccountDialog() {
     final passController = TextEditingController();
     showDialog(
