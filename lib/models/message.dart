@@ -6,6 +6,8 @@ class MessageModel {
   final String receiverId;
   final String message;
   final Timestamp timestamp;
+  final bool isRead;
+  final Timestamp? readAt;
 
   MessageModel({
     required this.senderId,
@@ -13,15 +15,19 @@ class MessageModel {
     required this.receiverId,
     required this.message,
     required this.timestamp,
+    this.isRead = false,
+    this.readAt,
   });
 
   factory MessageModel.fromMap(Map<String, dynamic> map) {
     return MessageModel(
-      senderId: map['senderId'],
-      senderEmail: map['senderEmail'],
-      receiverId: map['receiverId'],
-      message: map['message'],
-      timestamp: map['timestamp'],
+      senderId: map['senderId'] ?? '',
+      senderEmail: map['senderEmail'] ?? '',
+      receiverId: map['receiverId'] ?? '',
+      message: map['message'] ?? '',
+      timestamp: map['timestamp'] ?? Timestamp.now(),
+      isRead: map['isRead'] ?? false,
+      readAt: map['readAt'] as Timestamp?,
     );
   }
 
@@ -32,6 +38,8 @@ class MessageModel {
       'receiverId': receiverId,
       'message': message,
       'timestamp': timestamp,
+      'isRead': isRead,
+      if (readAt != null) 'readAt': readAt,
     };
   }
 }

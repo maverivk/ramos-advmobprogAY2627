@@ -164,6 +164,14 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     }
 
+                    // Mark incoming messages as read
+                    if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        ChatService()
+                            .markMessagesAsRead(currentUserId, tappedUserId);
+                      });
+                    }
+
                     List<QueryDocumentSnapshot> docs =
                         snapshot.data?.docs ?? [];
 
@@ -185,6 +193,32 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       return _buildEmptyState();
                     }
 
+                    // 👇 Find the index of the LAST outgoing (mine) message
+                    //     that has been READ by the other person.
+                    //     (Docs are ordered newest-first.)
+                    int lastSeenOutgoingIndex = -1;
+                    for (int i = 0; i < docs.length; i++) {
+                      final data = docs[i].data() as Map<String, dynamic>;
+                      final senderId = (data['senderId'] ?? '').toString();
+                      final isRead = data['isRead'] == true;
+                      if (senderId == currentUserId && isRead) {
+                        lastSeenOutgoingIndex = i;
+                        break;
+                      }
+                    }
+
+                    // 👇 Also find the index of the LATEST outgoing message
+                    //     regardless of read state.
+                    int latestOutgoingIndex = -1;
+                    for (int i = 0; i < docs.length; i++) {
+                      final data = docs[i].data() as Map<String, dynamic>;
+                      final senderId = (data['senderId'] ?? '').toString();
+                      if (senderId == currentUserId) {
+                        latestOutgoingIndex = i;
+                        break;
+                      }
+                    }
+
                     return ListView.builder(
                       controller: _scrollCtrl,
                       reverse: true,
@@ -204,12 +238,32 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                             (data['senderId'] ?? '').toString();
                         final isMe = senderId == currentUserId;
                         final timestamp = data['timestamp'] as Timestamp?;
+                        final isRead = data['isRead'] == true;
+                        final readAt = data['readAt'] as Timestamp?;
+
+                        // 👇 Determine status
+                        //  - If this is the last READ outgoing msg → "seen"
+                        //  - Else if this is the latest outgoing msg (unread)
+                        //    → "delivered"
+                        //  - Otherwise → no status
+                        String status = '';
+                        if (isMe) {
+                          if (docIndex == lastSeenOutgoingIndex) {
+                            status = 'seen';
+                          } else if (docIndex == latestOutgoingIndex &&
+                              !isRead) {
+                            status = 'delivered';
+                          }
+                        }
 
                         return _AnimatedMessageBubble(
                           key: ValueKey(docs[docIndex].id),
                           message: msgText,
                           isMe: isMe,
                           timestamp: timestamp,
+                          isRead: isRead,
+                          readAt: readAt,
+                          status: status,
                         );
                       },
                     );
@@ -374,12 +428,18 @@ class _AnimatedMessageBubble extends StatefulWidget {
   final String message;
   final bool isMe;
   final Timestamp? timestamp;
+  final bool isRead;
+  final Timestamp? readAt;
+  final String status; // '' | 'delivered' | 'seen'
 
   const _AnimatedMessageBubble({
     super.key,
     required this.message,
     required this.isMe,
     required this.timestamp,
+    required this.isRead,
+    this.readAt,
+    this.status = '',
   });
 
   @override
@@ -433,6 +493,7 @@ class _AnimatedMessageBubbleState extends State<_AnimatedMessageBubble>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isMe = widget.isMe;
+    final showStatus = widget.status.isNotEmpty;
 
     return FadeTransition(
       opacity: _fadeAnimation,
@@ -490,13 +551,29 @@ class _AnimatedMessageBubbleState extends State<_AnimatedMessageBubble>
                             : Colors.grey.shade600,
                       ),
                     ),
-                    if (isMe) ...[
+                    if (isMe && showStatus) ...[
                       const SizedBox(width: 4),
                       Icon(
                         Icons.done_all,
                         size: 14,
-                        color:
-                            theme.colorScheme.onPrimary.withOpacity(0.8),
+                        color: widget.status == 'seen'
+                            ? Colors.lightBlueAccent
+                            : theme.colorScheme.onPrimary.withOpacity(0.6),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        widget.status == 'seen'
+                            ? (widget.readAt != null
+                                ? 'seen ${_formatTime(widget.readAt)}'
+                                : 'seen')
+                            : 'delivered',
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: widget.status == 'seen'
+                              ? Colors.lightBlueAccent
+                              : theme.colorScheme.onPrimary.withOpacity(0.6),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ],

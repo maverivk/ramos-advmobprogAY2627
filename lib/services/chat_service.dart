@@ -6,10 +6,8 @@ class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  // Get all users (excluding the current logged-in user)
   Stream<List<Map<String, dynamic>>> getUsersStream() {
     final currentUid = _firebaseAuth.currentUser?.uid;
-
     return _firestore.collection('users').snapshots().map((snapshot) {
       return snapshot.docs
           .where((doc) => doc.id != currentUid)
@@ -22,7 +20,6 @@ class ChatService {
     });
   }
 
-  // Send a message
   Future<void> sendMessage(String receiverId, String message) async {
     final currentUser = _firebaseAuth.currentUser;
     if (currentUser == null) return;
@@ -37,6 +34,7 @@ class ChatService {
       receiverId: receiverId,
       message: message,
       timestamp: timestamp,
+      isRead: false,
     );
 
     final List<String> ids = [currentUserId, receiverId]..sort();
@@ -49,11 +47,9 @@ class ChatService {
         .add(newMessage.toMap());
   }
 
-  // Get messages between two users
   Stream<QuerySnapshot> getMessage(String userId, String otherUserId) {
     final List<String> ids = [userId, otherUserId]..sort();
     final String chatRoomId = ids.join('_');
-
     return _firestore
         .collection('chat_rooms')
         .doc(chatRoomId)
@@ -62,11 +58,36 @@ class ChatService {
         .snapshots();
   }
 
-  // Get last message time for each other user (for sorting)
+  // Mark incoming messages as read (with readAt timestamp)
+  Future<void> markMessagesAsRead(
+      String currentUserId, String otherUserId) async {
+    final List<String> ids = [currentUserId, otherUserId]..sort();
+    final String chatRoomId = ids.join('_');
+
+    final unreadSnap = await _firestore
+        .collection('chat_rooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .where('receiverId', isEqualTo: currentUserId)
+        .where('isRead', isEqualTo: false)
+        .get();
+
+    if (unreadSnap.docs.isEmpty) return;
+
+    final now = Timestamp.now();
+    final batch = _firestore.batch();
+    for (final doc in unreadSnap.docs) {
+      batch.update(doc.reference, {
+        'isRead': true,
+        'readAt': now,
+      });
+    }
+    await batch.commit();
+  }
+
   Future<Map<String, Timestamp>> getLastMessageTimes(
       String currentUserId) async {
     final result = <String, Timestamp>{};
-
     final chatRooms = await _firestore.collection('chat_rooms').get();
 
     for (final room in chatRooms.docs) {
@@ -90,11 +111,9 @@ class ChatService {
         if (ts != null) result[otherId] = ts;
       }
     }
-
     return result;
   }
 
-  // Look up a user's uid by email
   Future<String?> getUidByEmail(String email) async {
     final q = await _firestore
         .collection('users')
